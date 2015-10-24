@@ -18,45 +18,49 @@ public class CellTest {
     private Cell cell;
 
     @Test
-    public void WhenMakingACell_ThenAllValuesArePossible(){
-        List<Integer> possibleValues = Arrays.asList(1,2,3,4,5,6);
+    public void WhenMakingACell_ThenAllValuesArePossible() {
+        List<Integer> possibleValues = Arrays.asList(1, 2, 3, 4, 5, 6);
 
         //Then
-        assertThat(cell.getPossibleValues(),is(possibleValues));
-        assertThat(cell.getNumberOfPossibleValues(),is(6));
+        assertThat(cell.getPossibleValues(), is(possibleValues));
+        assertThat(cell.getNumberOfPossibleValues(), is(6));
     }
 
     @Test
-    public void WhenMakingACell_ThenItIsNotSolved(){
-        List<Integer> possibleValues = Arrays.asList(1,2,3,4,5,6);
+    public void WhenMakingACell_ThenItIsNotSolved() {
+        List<Integer> possibleValues = Arrays.asList(1, 2, 3, 4, 5, 6);
 
         //Then
         assertFalse(cell.isSolved());
     }
 
     @Test
-    public void WhenSettingAPossibleValue_ThenNoOtherValueIsPossibleAndCellIsSolved(){
-        for (int value : Arrays.asList(1,2,3,4,5,6)) {
-            List<Integer> possibleValues = Arrays.asList(value);
+    public void WhenSettingAPossibleValue_ThenNoOtherValueIsPossibleAndCellIsSolved() {
 
-            // When
-            cell.setValue(value);
+        //Given
 
-            //Then
-            assertThat(cell.getPossibleValues(),is(possibleValues));
-            assertTrue(cell.isSolved());
-        }
+        final int value = 6;
+        List<Integer> possibleValues = Arrays.asList(value);
+
+        // When
+        cell.setValue(value);
+
+        //Then
+        assertThat(cell.getPossibleValues(), is(possibleValues));
+        assertEquals(1,cell.getNumberOfPossibleValues());
+        assertTrue(cell.isSolved());
+
 
     }
 
     @Test
-    public void WhenSettingAValueThatIsNotPossible_ThenNoOtherValueIsPossibleAndCellIsSolved(){
-        List<Integer> possibleValues = Arrays.asList(1,2,3,4,5,6);
+    public void WhenSettingAValueThatIsNotPossible_ThenNoOtherValueIsPossibleAndCellIsSolved() {
+        List<Integer> possibleValues = Arrays.asList(1, 2, 3, 4, 5, 6);
 
         cell.setValue(7);
 
         //Then
-        assertThat(cell.getPossibleValues(),is(possibleValues));
+        assertThat(cell.getPossibleValues(), is(possibleValues));
         assertFalse(cell.isSolved());
     }
 
