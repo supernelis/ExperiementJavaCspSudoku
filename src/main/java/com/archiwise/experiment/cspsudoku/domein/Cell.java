@@ -18,4 +18,12 @@ public class Cell {
         return possibleValues.size();
     }
 
+    public boolean isSolved() {
+        return (getNumberOfPossibleValues() == 1);
+    }
+
+    public void setValue(final int value) {
+        if(possibleValues.contains(value))
+            possibleValues = Arrays.asList(value);
+    }
 }

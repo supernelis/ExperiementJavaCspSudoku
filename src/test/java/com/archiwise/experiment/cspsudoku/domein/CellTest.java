@@ -26,6 +26,40 @@ public class CellTest {
         assertThat(cell.getNumberOfPossibleValues(),is(6));
     }
 
+    @Test
+    public void WhenMakingACell_ThenItIsNotSolved(){
+        List<Integer> possibleValues = Arrays.asList(1,2,3,4,5,6);
+
+        //Then
+        assertFalse(cell.isSolved());
+    }
+
+    @Test
+    public void WhenSettingAPossibleValue_ThenNoOtherValueIsPossibleAndCellIsSolved(){
+        for (int value : Arrays.asList(1,2,3,4,5,6)) {
+            List<Integer> possibleValues = Arrays.asList(value);
+
+            // When
+            cell.setValue(value);
+
+            //Then
+            assertThat(cell.getPossibleValues(),is(possibleValues));
+            assertTrue(cell.isSolved());
+        }
+
+    }
+
+    @Test
+    public void WhenSettingAValueThatIsNotPossible_ThenNoOtherValueIsPossibleAndCellIsSolved(){
+        List<Integer> possibleValues = Arrays.asList(1,2,3,4,5,6);
+
+        cell.setValue(7);
+
+        //Then
+        assertThat(cell.getPossibleValues(),is(possibleValues));
+        assertFalse(cell.isSolved());
+    }
+
     @Before
     public void setup() {
         cell = new Cell();
