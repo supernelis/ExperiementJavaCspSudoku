@@ -17,5 +17,5 @@ public class Cell {
     public int getNumberOfPossibleValues() {
         return possibleValues.size();
     }
-    
+
 }

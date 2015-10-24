@@ -27,7 +27,7 @@ public class CellTest {
     }
 
     @Before
-    private void setup() {
+    public void setup() {
         cell = new Cell();
     }
 
