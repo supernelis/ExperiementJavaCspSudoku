@@ -5,6 +5,7 @@ import org.junit.Test;
 
 import java.lang.reflect.Array;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.hamcrest.core.Is.is;
@@ -18,7 +19,7 @@ public class CellTest {
     private Cell cell;
 
     @Test
-    public void WhenMakingACell_ThenAllValuesArePossible() {
+    public void whenMakingACell_ThenAllValuesArePossible() {
         List<Integer> possibleValues = Arrays.asList(1, 2, 3, 4, 5, 6);
 
         //Then
@@ -27,15 +28,13 @@ public class CellTest {
     }
 
     @Test
-    public void WhenMakingACell_ThenItIsNotSolved() {
-        List<Integer> possibleValues = Arrays.asList(1, 2, 3, 4, 5, 6);
-
+    public void whenMakingACell_ThenItIsNotSolved() {
         //Then
         assertFalse(cell.isSolved());
     }
 
     @Test
-    public void WhenSettingAPossibleValue_ThenNoOtherValueIsPossibleAndCellIsSolved() {
+    public void whenSettingAValue_ThenNoOtherValueIsPossibleAndCellIsSolved() {
 
         //Given
 
@@ -54,14 +53,15 @@ public class CellTest {
     }
 
     @Test
-    public void WhenSettingAValueThatIsNotPossible_ThenNoOtherValueIsPossibleAndCellIsSolved() {
-        List<Integer> possibleValues = Arrays.asList(1, 2, 3, 4, 5, 6);
+    public void whenSettingAValueThatIsNotPossible_ThenNoValueIsPossibleAnymore() {
+        List<Integer> possibleValues = Collections.emptyList();
 
         cell.setValue(7);
 
         //Then
         assertThat(cell.getPossibleValues(), is(possibleValues));
         assertFalse(cell.isSolved());
+        assertTrue(cell.isImpossible());
     }
 
     @Before

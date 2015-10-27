@@ -1,6 +1,7 @@
 package com.archiwise.experiment.cspsudoku.domein;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -25,5 +26,12 @@ public class Cell {
     public void setValue(final int value) {
         if(possibleValues.contains(value))
             possibleValues = Arrays.asList(value);
+        else{
+            possibleValues = Collections.emptyList();
+        }
+    }
+
+    public boolean isImpossible() {
+        return (getNumberOfPossibleValues() == 0);
     }
 }
