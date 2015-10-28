@@ -46,11 +46,13 @@ public class CellTest {
 
         //Then
         assertThat(cell.getPossibleValues(), is(possibleValues));
+        assertTrue(cell.isPossibleValue(6));
+        assertFalse(cell.isPossibleValue(7));
         assertEquals(1,cell.getNumberOfPossibleValues());
         assertTrue(cell.isSolved());
-
-
     }
+
+
 
     @Test
     public void whenSettingAValueThatIsNotPossible_ThenNoValueIsPossibleAnymore() {
@@ -63,6 +65,8 @@ public class CellTest {
         assertFalse(cell.isSolved());
         assertTrue(cell.isImpossible());
     }
+
+
 
     @Before
     public void setup() {
