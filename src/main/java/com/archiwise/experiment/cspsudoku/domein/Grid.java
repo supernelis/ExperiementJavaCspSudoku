@@ -43,6 +43,12 @@ public class Grid {
         }
     }
 
+    public void valueSetOnNeigtborCol(final int value, final int col) {
+        for(int row=0; row < NUMBER_OF_ROWS; row++){
+            cells[row][col-1].removePossibleValue(value);
+        }
+    }
+
     private void fillCellArray() {
         for (int row = 0; row < NUMBER_OF_ROWS; row++) {
             for (int col = 0; col < NUMBER_OF_COLUMNS; col++) {

@@ -83,7 +83,7 @@ public class GridTest {
     }
 
     @Test
-    public void whenValueIsSetInNeighborRow_ThenValueIsNotPossibleAnyMore(){
+    public void whenValueIsSetInNeighborRow_ThenValueIsNotPossibleAnyMoreInRow(){
         int value = 1;
         int row = 1;
         grid.valueSetOnNeigtborRow(value, row);
@@ -94,5 +94,18 @@ public class GridTest {
         assertTrue(grid.getCellAtPossition(3,2).isPossibleValue(value));
     }
 
-    
+    @Test
+    public void whenValueIsSetInNeighborCol_ThenValueIsNotPossibleAnyMoreInCol(){
+        int value = 1;
+        int col = 1;
+        grid.valueSetOnNeigtborCol(value, col);
+
+        assertFalse(grid.getCellAtPossition(1,col).isPossibleValue(value));
+        assertFalse(grid.getCellAtPossition(2,col).isPossibleValue(value));
+        assertFalse(grid.getCellAtPossition(3,col).isPossibleValue(value));
+        assertTrue(grid.getCellAtPossition(1,2).isPossibleValue(value));
+
+    }
+
+
 }
