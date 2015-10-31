@@ -80,6 +80,19 @@ public class GridTest {
 
         assertTrue(grid.isSolved());
         assertFalse(grid.isImpossible());
-
     }
+
+    @Test
+    public void whenValueIsSetInNeighborRow_ThenValueIsNotPossibleAnyMore(){
+        int value = 1;
+        int row = 1;
+        grid.valueSetOnNeigtborRow(value, row);
+
+        assertFalse(grid.getCellAtPossition(row, 1).isPossibleValue(value));
+        assertFalse(grid.getCellAtPossition(row, 2).isPossibleValue(value));
+        assertTrue(grid.getCellAtPossition(2,1).isPossibleValue(value));
+        assertTrue(grid.getCellAtPossition(3,2).isPossibleValue(value));
+    }
+
+    
 }

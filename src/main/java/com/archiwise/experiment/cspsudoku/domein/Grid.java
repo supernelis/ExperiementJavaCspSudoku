@@ -22,18 +22,24 @@ public class Grid {
     }
 
     public Cell getCellAtPossition(final int row, final int column) {
-        return cells[row][column];
+        return cells[row-1][column-1];
     }
 
     public void setValueAtPosition(final int value, final int row, final int column){
         for (int r = 0; r < NUMBER_OF_ROWS; r++) {
             for (int col = 0; col < NUMBER_OF_COLUMNS; col++) {
 
-                if(r == row && col == column) cells[r][col].setValue(value);
+                if(r == row -1 && col == column -1) cells[r][col].setValue(value);
                 else
                     cells[r][col].removePossibleValue(value);
 
             }
+        }
+    }
+
+    public void valueSetOnNeigtborRow(final int value, final int row) {
+        for(int col=0; col < NUMBER_OF_COLUMNS; col++){
+            cells[row-1][col].removePossibleValue(value);
         }
     }
 
