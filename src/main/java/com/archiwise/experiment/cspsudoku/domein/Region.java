@@ -45,7 +45,9 @@ public class Region implements CSProcess {
     @Override
     public void run() {
         processNeighborMessage(westIn, eastOut);
-
+        processNeighborMessage(eastIn, westOut);
+        processNeighborMessage(nordIn, southOut);
+        processNeighborMessage(southIn, nordOut);
 
     }
 

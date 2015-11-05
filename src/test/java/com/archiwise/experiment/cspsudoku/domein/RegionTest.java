@@ -24,6 +24,7 @@ public class RegionTest {
     private One2OneChannel<ValueAtPos> southIn;
     private One2OneChannel<ValueAtPos> southOut;
     private One2OneChannel<ValueAtPos> westOut;
+    private final ValueAtPos valueSend = new ValueAtPos(5, 2, 2);
 
     @Before
     public void setUp(){
@@ -63,14 +64,7 @@ public class RegionTest {
 
         ValueAtPos predefinedValue = new ValueAtPos(value, row, col);
 
-        region.setWestIn(westIn.in());
-        region.setWestOut(westOut.out());
-        region.setEastIn(eastIn.in());
-        region.setEastOut(eastOut.out());
-        region.setSouthIn(southIn.in());
-        region.setSouthOut(southOut.out());
-        region.setNordIn(nordIn.in());
-        region.setNordOut(nordOut.out());
+        connectAllChannelsToRegion();
 
         // When
         region.setPredefinedValue(predefinedValue);
@@ -81,6 +75,17 @@ public class RegionTest {
         verifyChannelContainsValue(southOut, predefinedValue);
         verifyChannelContainsValue(westOut, predefinedValue);
 
+    }
+
+    private void connectAllChannelsToRegion() {
+        region.setWestIn(westIn.in());
+        region.setWestOut(westOut.out());
+        region.setEastIn(eastIn.in());
+        region.setEastOut(eastOut.out());
+        region.setSouthIn(southIn.in());
+        region.setSouthOut(southOut.out());
+        region.setNordIn(nordIn.in());
+        region.setNordOut(nordOut.out());
     }
 
     /**
@@ -101,17 +106,54 @@ public class RegionTest {
     }
 
     @Test
-    public void WhenValueIsReceivedLeft_ValueIshandedToRight(){
-        final ValueAtPos valueSend = new ValueAtPos(5, 2, 2);
+    public void WhenValueIsReceivedWest_ValueIshandedToEast(){
 
-        region.setWestIn(westIn.in());
-        region.setEastOut(eastOut.out());
+
+        connectAllChannelsToRegion();
 
         westIn.out().write(valueSend);
 
         region.run();
 
         verifyChannelContainsValue(eastOut, valueSend);
+    }
+
+    @Test
+    public void WhenValueIsReceivedEast_ValueIshandedToWest(){
+
+        connectAllChannelsToRegion();
+
+        eastIn.out().write(valueSend);
+
+        region.run();
+
+        verifyChannelContainsValue(westOut, valueSend);
+    }
+
+    @Test
+    public void WhenValueIsReceivedNord_ValueIshandedToSouth(){
+
+
+        connectAllChannelsToRegion();
+
+        nordIn.out().write(valueSend);
+
+        region.run();
+
+        verifyChannelContainsValue(southOut, valueSend);
+    }
+
+    @Test
+    public void WhenValueIsReceivedSouth_ValueIshandedToNord(){
+
+
+        connectAllChannelsToRegion();
+
+        southIn.out().write(valueSend);
+
+        region.run();
+
+        verifyChannelContainsValue(nordOut, valueSend);
     }
 
     @Test
