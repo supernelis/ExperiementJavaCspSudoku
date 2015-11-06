@@ -5,7 +5,9 @@ import java.io.Serializable;
 /**
  * Created by nelis on 02/11/15.
  */
-public class ValueAtPos implements Serializable{
+public class ValueAtPos implements Serializable {
+
+
 
     private int value;
     private int row;
@@ -46,5 +48,26 @@ public class ValueAtPos implements Serializable{
         result = 31 * result + row;
         result = 31 * result + col;
         return result;
+    }
+
+    public int getValue() {
+        return value;
+    }
+
+    public int getRow() {
+        return row;
+    }
+
+    public int getCol() {
+        return col;
+    }
+
+    @Override
+    public String toString() {
+        return "ValueAtPos{" +
+               "value=" + value +
+               ", row=" + row +
+               ", col=" + col +
+               '}';
     }
 }

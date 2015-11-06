@@ -12,8 +12,9 @@ import java.util.Optional;
 /**
  * Created by nelis on 02/11/15.
  */
-public class Region implements CSProcess {
+public class Region implements CSProcess, ValueListener {
 
+    private Grid grid = new Grid();
     private ChannelOutput<ValueAtPos> display;
     private Optional<AltingChannelInput<ValueAtPos>> westIn = Optional.empty();
     private Optional<ChannelOutput<ValueAtPos>> eastOut = Optional.empty();
@@ -28,9 +29,15 @@ public class Region implements CSProcess {
 
     public Region(final ChannelOutput display) {
         this.display = display;
+        grid.addObserver(this);
     }
 
     public void setPredefinedValue(final ValueAtPos valueAtPos){
+        grid.setValueAtPosition(valueAtPos);
+    }
+
+    @Override
+    public void notifyValue(final ValueAtPos valueAtPos) {
         display.write(valueAtPos);
         writeIfPresent(valueAtPos,eastOut);
         writeIfPresent(valueAtPos,nordOut);
@@ -44,11 +51,10 @@ public class Region implements CSProcess {
 
     @Override
     public void run() {
-        processNeighborMessage(westIn, eastOut);
-        processNeighborMessage(eastIn, westOut);
-        processNeighborMessage(nordIn, southOut);
-        processNeighborMessage(southIn, nordOut);
-
+        processNeighborRowMessage(westIn, eastOut);
+        processNeighborRowMessage(eastIn, westOut);
+        processNeighborColMessage(nordIn, southOut);
+        processNeighborColMessage(southIn, nordOut);
     }
 
     public void setWestOut(final ChannelOutput<ValueAtPos> westOut) {
@@ -75,13 +81,24 @@ public class Region implements CSProcess {
         this.southIn = Optional.of(southIn);
     }
 
-    private void processNeighborMessage(final Optional<AltingChannelInput<ValueAtPos>> channelIn, final Optional<ChannelOutput<ValueAtPos>> channelOut) {
-        if(channelIn.isPresent() && channelIn.get().pending()){
+    private void processNeighborRowMessage(final Optional<AltingChannelInput<ValueAtPos>> channelIn, final Optional<ChannelOutput<ValueAtPos>> channelOut) {
+        if(channelContainsValue(channelIn)){
             ValueAtPos valueIn = channelIn.get().read();
-
+            grid.valueSetOnNeigtborRow(valueIn.getValue(),valueIn.getRow());
             writeIfPresent(valueIn,channelOut);
-
         }
+    }
+
+    private void processNeighborColMessage(final Optional<AltingChannelInput<ValueAtPos>> channelIn, final Optional<ChannelOutput<ValueAtPos>> channelOut) {
+        if(channelContainsValue(channelIn)){
+            ValueAtPos valueIn = channelIn.get().read();
+            grid.valueSetOnNeigtborCol(valueIn.getValue(),valueIn.getCol());
+            writeIfPresent(valueIn,channelOut);
+        }
+    }
+
+    private boolean channelContainsValue(final Optional<AltingChannelInput<ValueAtPos>> channelIn) {
+        return channelIn.isPresent() && channelIn.get().pending();
     }
 
 

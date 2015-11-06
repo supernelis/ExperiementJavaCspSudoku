@@ -3,6 +3,7 @@ package com.archiwise.experiment.cspsudoku.domein;
 import org.jcsp.lang.Channel;
 import org.jcsp.lang.One2OneChannel;
 import org.jcsp.util.Buffer;
+import org.jcsp.util.InfiniteBuffer;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -27,25 +28,25 @@ public class RegionTest {
     private final ValueAtPos valueSend = new ValueAtPos(5, 2, 2);
 
     @Before
-    public void setUp(){
-        display = Channel.one2one(new Buffer<ValueAtPos>(1));
-        westIn = Channel.one2one(new Buffer<ValueAtPos>(1));
-        eastOut = Channel.one2one(new Buffer<ValueAtPos>(1));
-        eastIn = Channel.one2one(new Buffer<ValueAtPos>(1));
-        westOut = Channel.one2one(new Buffer<ValueAtPos>(1));
-        nordIn = Channel.one2one(new Buffer<ValueAtPos>(1));
-        nordOut = Channel.one2one(new Buffer<ValueAtPos>(1));
-        southIn = Channel.one2one(new Buffer<ValueAtPos>(1));
-        southOut = Channel.one2one(new Buffer<ValueAtPos>(1));
+    public void setUp() {
+        display = Channel.one2one(new InfiniteBuffer<ValueAtPos>());
+        westIn = Channel.one2one(new InfiniteBuffer<ValueAtPos>());
+        eastOut = Channel.one2one(new InfiniteBuffer<ValueAtPos>());
+        eastIn = Channel.one2one(new InfiniteBuffer<ValueAtPos>());
+        westOut = Channel.one2one(new InfiniteBuffer<ValueAtPos>());
+        nordIn = Channel.one2one(new InfiniteBuffer<ValueAtPos>());
+        nordOut = Channel.one2one(new InfiniteBuffer<ValueAtPos>());
+        southIn = Channel.one2one(new InfiniteBuffer<ValueAtPos>());
+        southOut = Channel.one2one(new InfiniteBuffer<ValueAtPos>());
 
         region = new Region(display.out());
-            }
+    }
 
     @Test
-    public void WhenPredefinedValueIsSet_ThenDisplayIsUpdated(){
-        final int value=1;
-        final int row=1;
-        final int col=1;
+    public void WhenPredefinedValueIsSet_ThenDisplayIsUpdated() {
+        final int value = 1;
+        final int row = 1;
+        final int col = 1;
 
         ValueAtPos predefinedValue = new ValueAtPos(value, row, col);
         region.setPredefinedValue(predefinedValue);
@@ -54,13 +55,63 @@ public class RegionTest {
     }
 
     @Test
-    public void WhenPredefinedValueIsSet_ThenOutputChannelsAreUpdated(){
+    public void WhenFivePredefinedValueAreSet_ThenAllValuesAreKnownOnDisplay() {
+
+        ValueAtPos one = new ValueAtPos(1, 1, 1);
+        ValueAtPos two = new ValueAtPos(2, 2, 1);
+        ValueAtPos three = new ValueAtPos(3, 3, 1);
+        ValueAtPos four = new ValueAtPos(4, 1, 2);
+        ValueAtPos five = new ValueAtPos(5, 2, 2);
+        ValueAtPos six = new ValueAtPos(6, 3, 2);
+
+        region.setPredefinedValue(one);
+        region.setPredefinedValue(two);
+        region.setPredefinedValue(three);
+        region.setPredefinedValue(four);
+        region.setPredefinedValue(five);
+
+        verifyChannelContainsValue(display, one,two,three,four,five,six);
+
+    }
+
+    @Test
+    public void When4Col2RowValuesSet_ThenValueIsKnown() {
+
+        // COL 1 VALUES
+        ValueAtPos one = new ValueAtPos(1, 1, 1);
+        ValueAtPos two = new ValueAtPos(2, 2, 1);
+        ValueAtPos three = new ValueAtPos(3, 3, 1);
+
+        // ROW VALUES
+        ValueAtPos four = new ValueAtPos(4, 1, 1);
+        ValueAtPos five = new ValueAtPos(5, 1, 2);
+
+        connectAllChannelsToRegion();
+
+        // When
+        nordIn.out().write(one);
+        nordIn.out().write(two);
+        nordIn.out().write(three);
+
+        eastIn.out().write(four);
+        eastIn.out().write(five);
+
+        region.run();
+
+        // Then value is known
+        verifyChannelContainsValue(display, new ValueAtPos(6,1,1));
+
+    }
+
+
+    @Test
+    public void WhenPredefinedValueIsSet_ThenOutputChannelsAreUpdated() {
 
         //Given
 
-        final int value=1;
-        final int row=1;
-        final int col=1;
+        final int value = 1;
+        final int row = 1;
+        final int col = 1;
 
         ValueAtPos predefinedValue = new ValueAtPos(value, row, col);
 
@@ -92,22 +143,20 @@ public class RegionTest {
      * Helper method to verify if a value is available on a channel
      *
      * The method asserts that there is a value available, reads the value and asserts that it equals the value it gets as parameter.
-     *
-     * @param channel
-     * @param predefinedValue
      */
-    private void verifyChannelContainsValue(final One2OneChannel<ValueAtPos> channel, final ValueAtPos predefinedValue) {
-        //There is a value on the channel
-        assertTrue(channel.in().pending());
-        // Get the value
-        ValueAtPos valueAtRight = channel.in().read();
-        // Compare the value with the predefined value
-        assertEquals(predefinedValue,valueAtRight);
+    private void verifyChannelContainsValue(final One2OneChannel<ValueAtPos> channel, final ValueAtPos ... predefinedValues) {
+        for (ValueAtPos predefinedValue : predefinedValues) {
+            //There is a value on the channel
+            assertTrue("Expecting value "+predefinedValue.getValue() + " pos (" + predefinedValue.getRow() + "," + predefinedValue.getCol() + ")",channel.in().pending());
+            // Get the value
+            ValueAtPos valueAtRight = channel.in().read();
+            // Compare the value with the predefined value
+            assertEquals(predefinedValue, valueAtRight);
+        }
     }
 
     @Test
-    public void WhenValueIsReceivedWest_ValueIshandedToEast(){
-
+    public void WhenValueIsReceivedWest_ValueIshandedToEast() {
 
         connectAllChannelsToRegion();
 
@@ -119,7 +168,7 @@ public class RegionTest {
     }
 
     @Test
-    public void WhenValueIsReceivedEast_ValueIshandedToWest(){
+    public void WhenValueIsReceivedEast_ValueIshandedToWest() {
 
         connectAllChannelsToRegion();
 
@@ -131,8 +180,7 @@ public class RegionTest {
     }
 
     @Test
-    public void WhenValueIsReceivedNord_ValueIshandedToSouth(){
-
+    public void WhenValueIsReceivedNord_ValueIshandedToSouth() {
 
         connectAllChannelsToRegion();
 
@@ -144,8 +192,7 @@ public class RegionTest {
     }
 
     @Test
-    public void WhenValueIsReceivedSouth_ValueIshandedToNord(){
-
+    public void WhenValueIsReceivedSouth_ValueIshandedToNord() {
 
         connectAllChannelsToRegion();
 
@@ -157,7 +204,7 @@ public class RegionTest {
     }
 
     @Test
-    public void WhenNoRightChannelIsSet_ThenNoException(){
+    public void WhenNoRightChannelIsSet_ThenNoException() {
         final ValueAtPos valueSend = new ValueAtPos(5, 2, 2);
         westIn.out().write(valueSend);
         region.setWestIn(westIn.in());

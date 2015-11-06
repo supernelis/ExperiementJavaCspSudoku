@@ -1,8 +1,6 @@
 package com.archiwise.experiment.cspsudoku.domein;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -15,41 +13,77 @@ public class Grid {
     public static final int NUMBER_OF_COLUMNS = 2;
 
     private Cell[][] cells = new Cell[NUMBER_OF_ROWS][NUMBER_OF_COLUMNS];
+    private List<ValueListener> listeners = new ArrayList<>();
 
-    public Grid(){
-        fillCellArray();
+    public Grid() {
+        initializeCellArray();
 
     }
 
     public Cell getCellAtPossition(final int row, final int column) {
-        return cells[row-1][column-1];
+        return cells[row - 1][column - 1];
     }
 
-    public void setValueAtPosition(final int value, final int row, final int column){
-        for (int r = 0; r < NUMBER_OF_ROWS; r++) {
+    public void setValueAtPosition(final ValueAtPos valueAtPos) {
+        for (int row = 0; row < NUMBER_OF_ROWS; row++) {
             for (int col = 0; col < NUMBER_OF_COLUMNS; col++) {
 
-                if(r == row -1 && col == column -1) cells[r][col].setValue(value);
-                else
-                    cells[r][col].removePossibleValue(value);
-
+                if (row == valueAtPos.getRow() - 1 && col == valueAtPos.getCol() - 1) {
+                    setValueOnPos(valueAtPos);
+                } else {
+                    removePossibleValueFromPos(valueAtPos.getValue(), row, col);
+                }
             }
         }
     }
 
+    private void removePossibleValueFromPos(final int value, final int row, final int col) {
+        Cell cell = cells[row][col];
+        if (!cell.isSolved()) {
+            cell.removePossibleValue(value);
+            if (cell.isSolved()) {
+                notifyValue(new ValueAtPos(cell.getValue(), row+1, col+1));
+            }
+        }
+    }
+
+    public void setValueAtPosition(final int value, final int row, final int col) {
+        setValueAtPosition(new ValueAtPos(value, row, col));
+    }
+
+    public void addObserver(final ValueListener listener) {
+        listeners.add(listener);
+    }
+
+    private void setValueOnPos(final ValueAtPos valueAtPos) {
+        Cell cell = cells[valueAtPos.getRow() - 1][valueAtPos.getCol() - 1];
+        cell.setValue(valueAtPos.getValue());
+        if (cell.isSolved()) {
+            notifyValue(valueAtPos);
+        }
+    }
+
+    private void notifyValue(final ValueAtPos valueAtPos) {
+        for (ValueListener listener : listeners) {
+            listener.notifyValue(valueAtPos);
+        }
+    }
+
     public void valueSetOnNeigtborRow(final int value, final int row) {
-        for(int col=0; col < NUMBER_OF_COLUMNS; col++){
-            cells[row-1][col].removePossibleValue(value);
+        for (int col = 0; col < NUMBER_OF_COLUMNS; col++) {
+            removePossibleValueFromPos(value, row - 1, col);
+
         }
     }
 
     public void valueSetOnNeigtborCol(final int value, final int col) {
-        for(int row=0; row < NUMBER_OF_ROWS; row++){
-            cells[row][col-1].removePossibleValue(value);
+        for (int row = 0; row < NUMBER_OF_ROWS; row++) {
+            removePossibleValueFromPos(value, row, col - 1);
+
         }
     }
 
-    private void fillCellArray() {
+    private void initializeCellArray() {
         for (int row = 0; row < NUMBER_OF_ROWS; row++) {
             for (int col = 0; col < NUMBER_OF_COLUMNS; col++) {
                 cells[row][col] = new Cell();

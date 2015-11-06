@@ -2,11 +2,16 @@ package com.archiwise.experiment.cspsudoku.domein;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 /**
  * Created by nelis on 27/10/15.
@@ -14,6 +19,8 @@ import static org.junit.Assert.*;
 public class GridTest {
 
     private Grid grid;
+
+    private ValueListener listener = mock(ValueListener.class);
 
     @Before
     public void setUp() throws Exception {
@@ -62,6 +69,19 @@ public class GridTest {
     }
 
     @Test
+    public void whenSettingAValue_ThisValueIsNotified(){
+       //Given
+        grid.addObserver(listener);
+
+        // When
+        grid.setValueAtPosition(5,1,1);
+
+        // Then
+        verify(listener,times(1)).notifyValue(new ValueAtPos(5,1,1));
+
+    }
+
+    @Test
     public void whenSettingTwoTimesTheSameValue_TheGridIsImpossible(){
         grid.setValueAtPosition(5,1,1);
         grid.setValueAtPosition(5,2,1);
@@ -80,6 +100,20 @@ public class GridTest {
 
         assertTrue(grid.isSolved());
         assertFalse(grid.isImpossible());
+    }
+
+    @Test
+    public void whenFillingIn5Values_SixValuesAreNotified(){
+        //Given
+        grid.addObserver(listener);
+
+        grid.setValueAtPosition(1, 1,1);
+        grid.setValueAtPosition(2, 2,1);
+        grid.setValueAtPosition(3, 3,1);
+        grid.setValueAtPosition(4, 1,2);
+        grid.setValueAtPosition(5, 2,2);
+
+        verify(listener,times(6)).notifyValue(any());
     }
 
     @Test
