@@ -82,7 +82,7 @@ public class Region implements CSProcess, ValueListener {
     }
 
     private void processNeighborRowMessage(final Optional<AltingChannelInput<ValueAtPos>> channelIn, final Optional<ChannelOutput<ValueAtPos>> channelOut) {
-        if(channelContainsValue(channelIn)){
+        while(channelContainsValue(channelIn)){
             ValueAtPos valueIn = channelIn.get().read();
             grid.valueSetOnNeigtborRow(valueIn.getValue(),valueIn.getRow());
             writeIfPresent(valueIn,channelOut);
@@ -90,7 +90,7 @@ public class Region implements CSProcess, ValueListener {
     }
 
     private void processNeighborColMessage(final Optional<AltingChannelInput<ValueAtPos>> channelIn, final Optional<ChannelOutput<ValueAtPos>> channelOut) {
-        if(channelContainsValue(channelIn)){
+        while(channelContainsValue(channelIn)){
             ValueAtPos valueIn = channelIn.get().read();
             grid.valueSetOnNeigtborCol(valueIn.getValue(),valueIn.getCol());
             writeIfPresent(valueIn,channelOut);
